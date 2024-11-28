@@ -3,17 +3,20 @@ import { Task, TaskPriority, TaskStatus } from '../../../models/task.model';
 import { CommonModule } from '@angular/common';
 import { TaskresumeComponent } from '../taskresume/taskresume.component';
 import { TaskEvent } from '../../../models/taskevent.model';
+import { TaskformComponent } from '../taskform/taskform.component';
 
 @Component({
   selector: 'app-tasklist',
   standalone: true,
-  imports: [CommonModule, TaskresumeComponent],
+  imports: [CommonModule, TaskresumeComponent, TaskformComponent],
   templateUrl: './tasklist.component.html',
   styleUrl: './tasklist.component.css'
 })
 export class TasklistComponent implements OnInit{
   taskList:Task[] = [];
-  
+
+  taskEdit: Task = {} as Task;
+
   ngOnInit(): void {
     let task1:Task = new Task (1,"Tarea 1", "Descripción Tarea 1",TaskPriority.LOW,TaskStatus.PENDING,new Date("11/1/2024"),new Date("11/18/2024"),false);
     let task2:Task = new Task (2,"Tarea 2", "Descripción Tarea 2",TaskPriority.HIGH,TaskStatus.IN_PROGRESS,new Date("11/5/2024"),new Date("11/16/2024"),false);
@@ -55,12 +58,24 @@ export class TasklistComponent implements OnInit{
   }
 
   editTask(taskId:number){
-   console.log(`Editing Task with identify ${taskId}`);
+    console.log(`Editing Task with identify ${taskId}`);
+
+    let task = this.getTask(taskId)[0];
+
+    this.taskEdit = task;
   }
 
   deleteTask(taskId:number){
     this.taskList = this.taskList.filter((tarea:Task)=>{
       return tarea.id != taskId;
     });
+  }
+
+  createTask(task: Task){
+    console.log('Tarea creada ' + task);
+
+    task.id = this.taskList.length + 1;
+
+    this.taskList.push(task);  
   }
 }

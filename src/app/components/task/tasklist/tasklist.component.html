@@ -3,9 +3,11 @@
     <div class="col-md-12">
       <h3>Listado de Tareas</h3>
     </div>
+    <app-taskform (taskCreated)="createTask($event)" [taskEdit]="taskEdit"></app-taskform>
     <div class="col-md-12">
       <ng-container *ngFor="let task of taskList">
-        <app-taskresume *ngIf="task.isDelete != true" [taskInput]="task" (eventsTaskModify)="modifyTask($event)"></app-taskresume>
+        <app-taskresume *ngIf="task.isDelete != true" [taskInput]="task"
+          (eventsTaskModify)="modifyTask($event)"></app-taskresume>
       </ng-container>
     </div>
   </div>
