@@ -1,62 +1,99 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { customValidatorDate, customValidatorPriority } from './taskform.validators';
-import { Task, TaskStatus } from '../../../models/task.model';
+import {CommonModule} from '@angular/common';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {customValidator, customValidatorPriority} from './taskForm.validators';
+import {Task, TaskStatus} from '../../../models/task.models';
+import {ActivatedRoute, ParamMap} from '@angular/router';
+import {TaskService} from '../../../services/task.service';
 
 @Component({
   selector: 'app-taskform',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './taskform.component.html',
   styleUrl: './taskform.component.css'
 })
-export class TaskformComponent {
-  formTaskEdit: FormGroup;
+export class TaskformComponent implements OnChanges, OnInit {
 
-  @Input() taskEdit: Task = {} as Task; 
-  @Output() taskCreated = new EventEmitter<Task>();
+  @Input()
+  taskToEdit: Task | null = null; // Tarea a editar (null si estamos añadiendo)
 
-  constructor(formBuilder: FormBuilder){
+  formTaskEdit: FormGroup
+
+  constructor(private taskService: TaskService, private route: ActivatedRoute, formBuilder: FormBuilder) {
     this.formTaskEdit = formBuilder.group({
-      'name': ['', [Validators.required, Validators.maxLength(50), Validators.minLength(10)]],
-      'description': ['', [Validators.required, Validators.maxLength(250)]],
+      'name': ['', [Validators.required, Validators.maxLength(50)]],
+      'description': ['', [Validators.required, Validators.maxLength(255)]],
       'priority': ['', [Validators.required, customValidatorPriority()]],
-      'expirationDate': ['', [Validators.required, customValidatorDate()]],
-    });
+      'expirationDate': ['', [Validators.required, customValidator()]],
+
+    })
   }
 
-  onSubmit(): void {
-    if(this.formTaskEdit.valid){
-      console.log(this.formTaskEdit.value);
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      let id = params.get('id')
+      console.log(id)
+    })
+  }
 
-      let newTask = new Task(
-        Math.floor(Math.random() * 100000), 
-        this.formTaskEdit.value.name,
-        this.formTaskEdit.value.description,
-        this.formTaskEdit.value.priority,
-        TaskStatus.PENDING,
-        new Date(),
-        new Date(this.formTaskEdit.value.expirationDate),
-        false
-      );
+  @Output() formSubmit = new EventEmitter<Task>();
 
-      console.log('Tarea creada:', newTask);
-      this.taskCreated.emit(newTask);
-    }else{
-      console.log(`El formulario tiene errores ${this.formTaskEdit.errors}`);
+  onSubmit() {
+    if (this.formTaskEdit.valid) {
+      const taskData = this.formTaskEdit.value;
+
+      if (this.taskToEdit) {
+        // Editar tarea existente
+        const updatedTask: Task = {
+          ...this.taskToEdit,
+          ...taskData,
+          expirationDate: new Date(taskData.expirationDate),
+        };
+        console.log('Editando tarea:', updatedTask);
+        this.formSubmit.emit(updatedTask); // Emitir la tarea editada
+      } else {
+        // Añadir nueva tarea
+        const newTask: Task = new Task(
+          taskData.id = -1, // Generar ID aleatorio
+          taskData.name,
+          taskData.description,
+          taskData.priority,
+          TaskStatus.PENDING,
+          new Date(taskData.expirationDate),
+          new Date(), // Fecha de creación
+          false
+        );
+        console.log('Añadiendo nueva tarea:', newTask);
+        this.formSubmit.emit(newTask); // Emitir nueva tarea
+      }
+
+      this.formTaskEdit.reset(); // Limpiar el formulario
+    } else {
+      console.log('El formulario tiene errores:', this.formTaskEdit.errors);
     }
   }
 
-  ngOnChanges() {
-    if (this.taskEdit) {
+
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['taskToEdit'] && changes['taskToEdit'].currentValue) {
+      // Modo edición: llenar el formulario
+      const task = changes['taskToEdit'].currentValue;
       this.formTaskEdit.patchValue({
-        name: this.taskEdit.name,
-        description: this.taskEdit.description,
-        priority: this.taskEdit.priority,
-        expirationDate: this.taskEdit.expirationDate
+        name: task.name,
+        description: task.description,
+        priority: task.priority,
+        expirationDate: task.expirationDate.toISOString().slice(0, 16),
       });
+    } else {
+      // Modo creación: limpiar el formulario
+      this.formTaskEdit.reset();
     }
   }
+
+
+
 
 }

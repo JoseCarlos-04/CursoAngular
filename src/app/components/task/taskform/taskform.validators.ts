@@ -1,36 +1,37 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
+//login.validator.ts
+import {AbstractControl, ValidationErrors, ValidatorFn} from '@angular/forms';
 
-export function customValidatorDate(): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      let valorCampo = control.value;
+//Ejemplo estructura función
+export function customValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    let valorCampo = control.value
 
-      if(!valorCampo){
-        return null;
-      }
+    let today = new Date();
+    let expirationDate: Date = new Date(valorCampo);
 
-      let expirationDate = new Date(valorCampo);
-      let today = new Date();
-      
-      if(expirationDate >= today){
-        return null;
-      }else{
-        return {invalidDate : true};
-      }
-    };
+    if (expirationDate >= today) {
+      return null;
+    }
+
+    return {'invalidDate': true};
+
+  };
 }
 
+
+
 export function customValidatorPriority(): ValidatorFn {
-  return  (control: AbstractControl): ValidationErrors | null => {
-    let valorSelect = control.value;
+  return (control: AbstractControl): ValidationErrors | null => {
+    const valorCampo = control.value;
 
-    if(!valorSelect){
-      return null;
+    // Validar si el valor es L, M o H
+    const valoresValidos:string[] = ['L', 'M', 'H'];
+
+    if (!valoresValidos.includes(valorCampo)) {
+      return { 'invalidValuePriority': true }; // Error personalizado
     }
 
-    if(valorSelect == "L" || valorSelect == "M" || valorSelect == "H"){
-      return null;
-    }else{
-      return {invalidSelect : true};
-    }
+    // Si el valor es válido, no hay errores
+    return null;
   };
 }
