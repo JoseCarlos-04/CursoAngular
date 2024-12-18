@@ -1,26 +1,31 @@
-<div class="container">
-    <div class="row">
-        <div class="col-md-12 d-flex justify-content-center">
-            <h1>Login</h1>
+<app-nav-bar></app-nav-bar>
+  <div class="container">
+    <h1 class="text-center mt-3">Welcome to TaskList</h1>
+    <form [formGroup]="formLogin" (ngSubmit)="Onsubmit()">
+      <div class="form-group">
+        <label for="exampleInputEmail1">Email address</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" formControlName="email" [ngClass]="{'is-valid': formLogin.get('email')?.valid && formLogin.get('email')?.touched, 'is-invalid': formLogin.get('email')?.invalid && formLogin.get('email')?.touched}">
+        <div class="invalid-feedback" *ngIf="formLogin.get('email')?.invalid && formLogin.get('email')?.touched">
+          <small *ngIf="formLogin.get('email')?.hasError('required')">El email es obligatorio.</small>
+          <small *ngIf="formLogin.get('email')?.hasError('email')">Email inválido.</small>
         </div>
-        <div class="col-md-12 d-flex justify-content-center">
-            <form>
-                <div class="form-group">
-                    <label for="exampleInputEmail1">Usuario</label>
-                    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-                        placeholder="Usuario">
-
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                </div>
-                <div class="form-group form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                </div>
-                <button type="submit" class="btn btn-primary">Enviar</button>
-            </form>
+      </div>
+      <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" formControlName="password" [ngClass]="{'is-valid': formLogin.get('password')?.valid && formLogin.get('password')?.touched, 'is-invalid': formLogin.get('password')?.invalid && formLogin.get('password')?.touched}">
+        <div class="invalid-feedback" *ngIf="formLogin.get('password')?.invalid && formLogin.get('password')?.touched">
+          <small *ngIf="formLogin.get('password')?.hasError('required')">La contraseña es obligatoria.</small>
+          <small *ngIf="formLogin.get('password')?.hasError('minlength')">La contraseña debe tener al menos 6 caracteres.</small>
         </div>
-    </div>
-</div>
+      </div>
+      <div class="form-group form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1">
+        <label class="form-check-label" for="exampleCheck1">Check me out</label>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <div class="d-flex justify-content-center">
+        <button (click)="loginWithGoogle()" class="btn btn-primary"><i class="bi bi-google m-1"></i>Login con Google</button>
+      </div>
+    </form>
+  </div>
+<app-footer></app-footer>
