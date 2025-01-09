@@ -5,8 +5,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  GoogleAuthProvider
+  GoogleAuthProvider, onAuthStateChanged, User
 } from '@angular/fire/auth';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -35,4 +36,9 @@ export class AuthService {
   logout() {
     return signOut(this.auth);
   }
+
+  getCurrentUser() {
+    return this.auth.currentUser;
+  }
+
 }

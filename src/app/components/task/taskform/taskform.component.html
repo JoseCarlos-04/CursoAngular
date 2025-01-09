@@ -1,7 +1,9 @@
+<div>
+  <h1>Bienvenido {{userName}} {{userLastName}} - {{userEmail}}</h1>
+</div>
 <div class="row">
   <div class="col-md-12">
     <form [formGroup]="formTaskEdit" (ngSubmit)="onSubmit()">
-
       <!-- Nombre -->
       <div class="form-group">
         <label for="exampleFormControlInput1">Nombre</label>
@@ -24,7 +26,6 @@
             menos de 50 caracteres</small>
         </div>
       </div>
-
 
       <!-- Descripcion -->
       <div class="form-group">
@@ -98,5 +99,3 @@
     </form>
   </div>
 </div>
-
-

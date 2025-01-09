@@ -3,8 +3,10 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {customValidator, customValidatorPriority} from './taskform.validators';
 import {Task, TaskStatus} from '../../../models/task.models';
-import {Router, ActivatedRoute, ParamMap} from '@angular/router';
+import {ActivatedRoute, ParamMap} from '@angular/router';
 import {TaskService} from '../../../services/task.service';
+import {AuthService} from '../../../services/auth.service';
+import {PersonService} from '../../../services/person.service';
 
 @Component({
   selector: 'app-taskform',
@@ -20,13 +22,16 @@ export class TaskformComponent implements OnChanges, OnInit {
 
   formTaskEdit: FormGroup
 
-  constructor(private taskService: TaskService, private route: ActivatedRoute, formBuilder: FormBuilder) {
+  userName: String = "";
+  userLastName: String = "";
+  userEmail: String = "";
+
+  constructor(private taskService: TaskService, private route: ActivatedRoute, formBuilder: FormBuilder, private authService: AuthService, private personService: PersonService) {
     this.formTaskEdit = formBuilder.group({
       'name': ['', [Validators.required, Validators.maxLength(50)]],
       'description': ['', [Validators.required, Validators.maxLength(255)]],
       'priority': ['', [Validators.required, customValidatorPriority()]],
-      'expirationDate': ['', [Validators.required, customValidator()]],
-
+      'expirationDate': ['', [Validators.required, customValidator()]]
     })
   }
 
@@ -35,6 +40,18 @@ export class TaskformComponent implements OnChanges, OnInit {
       let id = params.get('id')
       console.log(id)
     })
+
+    let currentUser = this.authService.getCurrentUser();
+
+    this.personService.getPersonByUid(currentUser!.uid).then(person => {
+      if(person) {
+        this.userName = person.name;
+        this.userLastName = person.surname;
+        this.userEmail = person.email;
+      }else {
+        console.error('No person found for the current user.');
+      }
+    });
   }
 
   @Output() formSubmit = new EventEmitter<Task>();
@@ -74,9 +91,6 @@ export class TaskformComponent implements OnChanges, OnInit {
     }
   }
 
-
-
-
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['taskToEdit'] && changes['taskToEdit'].currentValue) {
       // Modo edición: llenar el formulario
@@ -92,8 +106,5 @@ export class TaskformComponent implements OnChanges, OnInit {
       this.formTaskEdit.reset();
     }
   }
-
-
-
 
 }
