@@ -10,11 +10,10 @@ export class PersonService {
   constructor(private database: Database) { }
 
   savePerson(person: Person) {
-    const personsRef = ref(this.database, `persons/${person.uid}`);
+    const personsRef = ref(this.database, `/persons/${person.uid}`);
 
-    return set(personsRef, person).then(() => {
-        console.log('Person saved successfully');
-      })
+    console.log(person);
+    return set(personsRef, person);
   }
 
   getPersonByUid(uid: String): Promise<Person | null> {

@@ -23,7 +23,8 @@ export class SigninComponent {
       name: ['', [Validators.required, Validators.maxLength(50), Validators.minLength(5)]],
       lastName: ['', [Validators.required, Validators.maxLength(50), Validators.minLength(5)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]});
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      admin: ['']});
   }
 
   Onsubmit() {
@@ -36,9 +37,9 @@ export class SigninComponent {
           let email = this.formSignin.get("email")?.value;
           let admin = this.formSignin.get("admin")?.value;
           let role = admin ? Role.ADMIN : Role.USER;
-          let now = new Date().toDateString();
+          let dateNow = new Date().toISOString();
 
-          let personRegister: Person = new Person(response.user.uid, name, surname, email!, role, now);
+          let personRegister: Person = new Person(response.user.uid, name, surname, email!, role, dateNow);
 
           this.personService.savePerson(personRegister);
 
