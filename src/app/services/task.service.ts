@@ -1,6 +1,8 @@
-import {Injectable, Input} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Task, TaskPriority, TaskStatus} from '../models/task.models';
 import {TaskEvent} from '../models/TaskEvent.models';
+import {Database, listVal, ref, remove} from '@angular/fire/database';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +17,19 @@ export class TaskService {
   ]
   task: Task = new Task(1, "Tarea 1", "Descripción Tarea 1", TaskPriority.LOW, TaskStatus.PENDING, new Date("11/1/2024"), new Date("11/18/2024"), false);
 
-  constructor() { }
+  constructor(private database: Database) { }
+
+  getAllTasks() : Observable<Task[]> {
+    const taskRef = ref(this.database, "/taskList");
+
+    return listVal(taskRef) as Observable<Task[]>;
+  }
+
+  remove(taskId: string) : Promise<void> {
+    const taskRef = ref(this.database, `/taskList/${taskId}`);
+
+    return remove(taskRef);
+  }
 
   getTasks(): Task[] {
     return this.tasklist;
